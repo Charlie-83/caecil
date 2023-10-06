@@ -19,7 +19,6 @@ std::vector<Token> getTokens()
             case AccumulatorState::string:
                 if (accumulator == "function")
                 {
-
                     tokens.emplace_back(TokenType::function, nullptr);
                     break;
                 }
@@ -61,3 +60,5 @@ std::vector<Token> getTokens()
         }
     }
 }
+
+Node getAST(std::vector<Token> tokens) {}
