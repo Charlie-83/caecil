@@ -24,6 +24,7 @@ enum class TokenType
     close_bracket,
     open_brace,
     close_brace,
+    comma,
 };
 
 enum class DataType

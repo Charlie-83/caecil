@@ -15,7 +15,7 @@ std::vector<Token> getTokens()
     {
         char character = getchar();
 
-        std::vector<char> terminal_characters = {' ', EOF, '\n', '(', ')', '{', '}', '[', ']'};
+        std::vector<char> terminal_characters = {' ', EOF, '\n', '(', ')', '{', '}', '[', ']', ','};
         if (std::find(terminal_characters.begin(), terminal_characters.end(), character) !=
             terminal_characters.end())
         {
@@ -53,18 +53,28 @@ std::vector<Token> getTokens()
                 return tokens;
             case '\n':
                 tokens.emplace_back(TokenType::newline, nullptr);
+                break;
             case '(':
                 tokens.emplace_back(TokenType::open_parenthesis, nullptr);
+                break;
             case ')':
                 tokens.emplace_back(TokenType::close_parenthesis, nullptr);
+                break;
             case '{':
                 tokens.emplace_back(TokenType::open_brace, nullptr);
+                break;
             case '}':
                 tokens.emplace_back(TokenType::close_brace, nullptr);
+                break;
             case '[':
                 tokens.emplace_back(TokenType::open_bracket, nullptr);
+                break;
             case ']':
                 tokens.emplace_back(TokenType::close_bracket, nullptr);
+                break;
+            case ',':
+                tokens.emplace_back(TokenType::comma, nullptr);
+                break;
             }
 
             if (character == EOF)
