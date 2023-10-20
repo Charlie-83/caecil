@@ -21,9 +21,6 @@ int main()
         case (TokenType::number):
             std::cout << std::format("number: {}", std::get<double>(t.data)) << std::endl;
             break;
-        case (TokenType::other):
-            std::cout << "other: " + std::get<std::string>(t.data) << std::endl;
-            break;
         case (TokenType::function):
             std::cout << "function" << std::endl;
             break;

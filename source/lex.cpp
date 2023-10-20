@@ -46,9 +46,6 @@ std::vector<Token> getTokens()
                 break;
             case AccumulatorState::none:
                 break;
-            case AccumulatorState::unknown:
-                tokens.emplace_back(TokenType::other, accumulator);
-                break;
             }
             switch (character)
             {
@@ -88,15 +85,15 @@ std::vector<Token> getTokens()
 
             if (accumulator_state == AccumulatorState::none)
             {
-                if (isalpha(character))
+                if (isalpha(character) || character == '_')
                     accumulator_state = AccumulatorState::string;
                 else if (isdigit(character))
                     accumulator_state = AccumulatorState::number;
                 else
-                    accumulator_state = AccumulatorState::unknown;
+                    throw std::logic_error(accumulator);
             }
             if (accumulator_state == AccumulatorState::number && isalpha(character))
-                accumulator_state = AccumulatorState::unknown;
+                throw std::logic_error(accumulator);
         }
     }
 }

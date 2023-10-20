@@ -43,7 +43,6 @@ enum class AccumulatorState
     none,
     string,
     number,
-    unknown,
 };
 
 std::vector<Token> getTokens();
