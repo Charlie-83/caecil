@@ -15,8 +15,8 @@ std::vector<Token> getTokens()
     {
         char character = getchar();
 
-        std::vector<char> terminal_characters = {' ', EOF, '\n', '(', ')', '{',
-                                                 '}', '[', ']',  ',', '='};
+        std::vector<char> terminal_characters = {' ', EOF, '\n', '(', ')', '{', '}',
+                                                 '[', ']', ',',  '=', ':', ';'};
         if (std::find(terminal_characters.begin(), terminal_characters.end(), character) !=
             terminal_characters.end())
         {
@@ -52,9 +52,6 @@ std::vector<Token> getTokens()
             {
             case EOF:
                 return tokens;
-            case '\n':
-                tokens.emplace_back(TokenType::newline, nullptr);
-                break;
             case '(':
                 tokens.emplace_back(TokenType::open_parenthesis, nullptr);
                 break;
@@ -79,15 +76,12 @@ std::vector<Token> getTokens()
             case '=':
                 tokens.emplace_back(TokenType::equals, nullptr);
                 break;
-            }
-
-            if (character == EOF)
-            {
-                return tokens;
-            }
-            else if (character == '\n')
-            {
-                tokens.emplace_back(TokenType::newline, nullptr);
+            case ':':
+                tokens.emplace_back(TokenType::colon, nullptr);
+                break;
+            case ';':
+                tokens.emplace_back(TokenType::semicolon, nullptr);
+                break;
             }
 
             accumulator_state = AccumulatorState::none;

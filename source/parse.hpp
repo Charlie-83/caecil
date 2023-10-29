@@ -24,6 +24,7 @@ struct PrototypeNode : Node
 struct FunctionNode : Node
 {
     PrototypeNode prototype;
+    Node body;
 };
 
 struct ExpressionNode : Node
@@ -57,6 +58,10 @@ struct NumberNode : Node
 struct SequenceNode : Node
 {
     std::vector<Node> nodes;
+};
+
+struct EmptyNode : Node
+{
 };
 
 Node getAST(std::vector<Token> tokens);

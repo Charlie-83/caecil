@@ -11,8 +11,6 @@ Node parse(std::vector<Token> tokens, int *pointer)
     while (*pointer < (int)tokens.size())
     {
         expression_sequence.nodes.push_back(parseExpression(tokens, pointer));
-        if (tokens[*pointer].type != TokenType::newline)
-            throw std::logic_error("Expected new line");
         (*pointer)++;
     }
     return expression_sequence;
@@ -65,7 +63,27 @@ Node parseFunction(std::vector<Token> tokens, int *pointer)
         *pointer += 3;
     }
     *pointer += 1;
-    return PrototypeNode{{}, return_type, name, types, args};
+    if (tokens[*pointer].type != TokenType::open_brace)
+        return PrototypeNode{{}, return_type, name, types, args};
+    else
+    {
+        *pointer += 1;
+        std::vector<Node> body = {};
+        while (tokens[*pointer].type != TokenType::close_brace)
+        {
+            body.push_back(parseExpression(tokens, pointer));
+        }
+        switch (body.size())
+        {
+        case 0:
+            return FunctionNode{{}, PrototypeNode{{}, return_type, name, types, args}, EmptyNode()};
+        case 1:
+            return FunctionNode{{}, PrototypeNode{{}, return_type, name, types, args}, body[0]};
+        default:
+            return FunctionNode{
+                {}, PrototypeNode{{}, return_type, name, types, args}, SequenceNode{{}, body}};
+        }
+    }
 }
 
 Node parseAssignment(std::vector<Token> tokens, int *pointer)

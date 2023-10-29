@@ -17,7 +17,6 @@ enum class TokenType
     function,
     eof,
     type,
-    newline,
     open_parenthesis,
     close_parenthesis,
     open_bracket,
@@ -26,6 +25,8 @@ enum class TokenType
     close_brace,
     comma,
     equals,
+    semicolon,
+    colon,
 };
 
 enum class DataType
