@@ -89,7 +89,20 @@ Node parseExpression(std::vector<Token> tokens, int *pointer)
         return parseFunction(tokens, pointer);
     case TokenType::type:
         return parseDeclareAssign(tokens, pointer);
+    case TokenType::id:
+        return parseDeclareAssign(tokens, pointer);
+    case TokenType::number:
+        return parseNumber(tokens, pointer);
+    default:
+        std::logic_error("Wrong token at start of expression");
     }
+}
+
+Node parseNumber(std::vector<Token> tokens ,int *pointer)
+{
+    double value = checkGetData<double>(*pointer, tokens, TokenType::number);
+    *pointer += 1;
+    return NumberNode{{}, value};
 }
 
 Node parseFunction(std::vector<Token> tokens, int *pointer)

@@ -4,12 +4,6 @@
 #include <variant>
 #include <vector>
 
-union TokenData
-{
-    std::string id;
-    double number;
-};
-
 enum class TokenType
 {
     id,

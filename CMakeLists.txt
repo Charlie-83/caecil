@@ -13,6 +13,7 @@ include_directories (
 
 set (SOURCES
     source/lex.cpp
+    source/parse.cpp
 )
 add_library(caecil ${SOURCES})
 add_executable(main source/main.cpp)

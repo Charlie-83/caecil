@@ -72,6 +72,7 @@ struct EmptyNode : Node
 
 Node getAST(std::vector<Token> tokens);
 Node parse(std::vector<Token> tokens, int *pointer);
+Node parseNumber(std::vector<Token> tokens, int *pointer);
 Node parseExpression(std::vector<Token> tokens, int *pointer);
 Node parseFunction(std::vector<Token> tokens, int *pointer);
 Node parseAssign(std::vector<Token> tokens, int *pointer);

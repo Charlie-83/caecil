@@ -1,5 +1,7 @@
+#include <cstdio>
 #include <iostream>
 #include <lex.hpp>
+#include <parse.hpp>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <vector>
@@ -7,6 +9,7 @@
 int main()
 {
     spdlog::set_level(spdlog::level::debug);
+    freopen("source/test.cae", "r", stdin);
     std::vector<Token> tokens = getTokens();
 
     std::cout << std::format("Found {} tokens", tokens.size()) << std::endl;
@@ -19,7 +22,8 @@ int main()
             std::cout << "id: " + std::get<std::string>(t.data) << std::endl;
             break;
         case (TokenType::number):
-            std::cout << std::format("number: {}", std::get<double>(t.data)) << std::endl;
+            std::cout << std::format("number: {}", std::get<double>(t.data))
+                      << std::endl;
             break;
         case (TokenType::function):
             std::cout << "function" << std::endl;
@@ -29,4 +33,8 @@ int main()
             break;
         }
     }
+
+    int pointer = 0;
+    auto root = parse(tokens, &pointer);
+    pointer = 0;
 }
