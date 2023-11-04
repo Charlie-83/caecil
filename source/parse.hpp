@@ -45,6 +45,12 @@ struct VariableNode : Node
 
 struct AssignmentNode : Node
 {
+    VariableNode variable;
+    Node rhs;
+};
+
+struct DeclareAssignmentNode : Node
+{
     DataType lhs_type;
     VariableNode variable;
     Node rhs;
@@ -68,4 +74,5 @@ Node getAST(std::vector<Token> tokens);
 Node parse(std::vector<Token> tokens, int *pointer);
 Node parseExpression(std::vector<Token> tokens, int *pointer);
 Node parseFunction(std::vector<Token> tokens, int *pointer);
-Node parseAssignment(std::vector<Token> tokens, int *pointer);
+Node parseAssign(std::vector<Token> tokens, int *pointer);
+Node parseDeclareAssign(std::vector<Token> tokens, int *pointer);

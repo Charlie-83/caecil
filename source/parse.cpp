@@ -88,7 +88,7 @@ Node parseExpression(std::vector<Token> tokens, int *pointer)
         (*pointer)++;
         return parseFunction(tokens, pointer);
     case TokenType::type:
-        return parseAssignment(tokens, pointer);
+        return parseDeclareAssign(tokens, pointer);
     }
 }
 
@@ -143,12 +143,21 @@ Node parseFunction(std::vector<Token> tokens, int *pointer)
     }
 }
 
-Node parseAssignment(std::vector<Token> tokens, int *pointer)
+Node parseAssign(std::vector<Token> tokens, int *pointer)
+{
+    auto name = checkGetData<std::string>(*pointer + 1, tokens, TokenType::id);
+    check(*pointer + 2, tokens, TokenType::equals);
+    *pointer += 3;
+    Node rhs = parseExpression(tokens, pointer);
+    return AssignmentNode{{}, {{}, name}, rhs};
+}
+
+Node parseDeclareAssign(std::vector<Token> tokens, int *pointer)
 {
     auto type = checkGetData<DataType>(*pointer, tokens, TokenType::type);
     auto name = checkGetData<std::string>(*pointer + 1, tokens, TokenType::id);
     check(*pointer + 2, tokens, TokenType::equals);
     *pointer += 3;
     Node rhs = parseExpression(tokens, pointer);
-    return AssignmentNode{{}, type, {{}, name}, rhs};
+    return DeclareAssignmentNode{{}, type, {{}, name}, rhs};
 }
