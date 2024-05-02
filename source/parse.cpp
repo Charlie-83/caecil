@@ -1,6 +1,8 @@
 #include "parse.hpp"
 #include "lex.hpp"
+#include <iostream>
 #include <stdexcept>
+#include <unordered_map>
 
 static Token check(int pointer, std::vector<Token> tokens, TokenType type) {
     if (tokens[pointer].type != type) {
@@ -156,3 +158,58 @@ Node parseDeclareAssign(std::vector<Token> tokens, int &pointer) {
     Node rhs = parseExpression(tokens, pointer);
     return DeclareAssignmentNode{{}, type, {{}, name}, rhs};
 }
+
+std::unordered_map<DataType, std::string> datatype_to_string = {
+    {DataType::number, "number"},
+    {DataType::string, "string"},
+};
+std::unordered_map<BinaryOp, std::string> binary_op_to_string = {
+    {BinaryOp::plus, "+"},
+};
+
+std::string NodeToString(Node root) {
+    std::string output = "";
+    if (typeid(root) == typeid(PrototypeNode)) {
+        PrototypeNode prototype = static_cast<PrototypeNode>(root);
+        output =
+            datatype_to_string.at(prototype.return_type) + " " + prototype.name + " (";
+        for (int i = 0; i < static_cast<int>(prototype.types.size()); ++i) {
+            output += datatype_to_string.at(prototype.types.at(i)) + " " +
+                      prototype.args.at(i) + ", ";
+        }
+        return output;
+    } else if (typeid(root) == typeid(FunctionNode)) {
+        FunctionNode function = static_cast<FunctionNode>(root);
+        return NodeToString(function.prototype) + " {\n" +
+               NodeToString(function.body) + "}";
+    } else if (typeid(root) == typeid(BinaryOpNode)) {
+        BinaryOpNode binary = static_cast<BinaryOpNode>(root);
+        return NodeToString(binary.left) + " " +
+               binary_op_to_string.at(binary.operation) + " " +
+               NodeToString(binary.right);
+    } else if (typeid(root) == typeid(VariableNode)) {
+        VariableNode variable = static_cast<VariableNode>(root);
+        return variable.name;
+    } else if (typeid(root) == typeid(AssignmentNode)) {
+        AssignmentNode assignment = static_cast<AssignmentNode>(root);
+        return NodeToString(assignment.variable) + " = " +
+               NodeToString(assignment.rhs);
+    } else if (typeid(root) == typeid(DeclareAssignmentNode)) {
+        DeclareAssignmentNode declare = static_cast<DeclareAssignmentNode>(root);
+        return datatype_to_string.at(declare.lhs_type) + " " +
+               NodeToString(declare.variable) + " = " + NodeToString(declare.rhs);
+    } else if (typeid(root) == typeid(NumberNode)) {
+        NumberNode number = static_cast<NumberNode>(root);
+        return std::to_string(number.value);
+    } else if (typeid(root) == typeid(SequenceNode)) {
+        SequenceNode seq = static_cast<SequenceNode>(root);
+        for (Node node : seq.nodes) {
+            output += NodeToString(node) + "\n";
+        }
+    } else if (typeid(root) == typeid(EmptyNode)) {
+        return "";
+    }
+    throw std::runtime_error("Unknown node type");
+}
+
+void printTree(Node root) { std::cout << NodeToString(root) << std::endl; }

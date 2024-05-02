@@ -61,3 +61,5 @@ Node parseExpression(std::vector<Token> tokens, int &pointer);
 Node parseFunction(std::vector<Token> tokens, int &pointer);
 Node parseAssign(std::vector<Token> tokens, int &pointer);
 Node parseDeclareAssign(std::vector<Token> tokens, int &pointer);
+
+void printTree(Node root);
