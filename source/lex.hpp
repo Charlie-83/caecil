@@ -4,8 +4,7 @@
 #include <variant>
 #include <vector>
 
-enum class TokenType
-{
+enum class TokenType {
     id,
     number,
     function,
@@ -23,20 +22,14 @@ enum class TokenType
     colon,
 };
 
-enum class DataType
-{
-    string,
-    number
-};
+enum class DataType { string, number };
 
-struct Token
-{
+struct Token {
     TokenType type;
     std::variant<std::string, double, DataType, std::nullptr_t> data;
 };
 
-enum class AccumulatorState
-{
+enum class AccumulatorState {
     none,
     string,
     number,

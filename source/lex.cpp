@@ -3,40 +3,30 @@
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
-#include <variant>
 #include <vector>
 
-std::vector<Token> getTokens()
-{
+std::vector<Token> getTokens() {
     std::vector<Token> tokens = {};
     std::string accumulator = "";
     AccumulatorState accumulator_state = AccumulatorState::none;
-    while (true)
-    {
+    while (true) {
         char character = getchar();
 
         std::vector<char> terminal_characters = {' ', EOF, '\n', '(', ')', '{', '}',
                                                  '[', ']', ',',  '=', ':', ';'};
-        if (std::find(terminal_characters.begin(), terminal_characters.end(), character) !=
-            terminal_characters.end())
-        {
-            switch (accumulator_state)
-            {
+        if (std::find(terminal_characters.begin(), terminal_characters.end(),
+                      character) != terminal_characters.end()) {
+            switch (accumulator_state) {
             case AccumulatorState::string:
                 if (accumulator == "")
                     break;
-                else if (accumulator == "function")
-                {
+                else if (accumulator == "function") {
                     tokens.emplace_back(TokenType::function, nullptr);
                     break;
-                }
-                else if (accumulator == "string")
-                {
+                } else if (accumulator == "string") {
                     tokens.emplace_back(TokenType::type, DataType::string);
                     break;
-                }
-                else if (accumulator == "number")
-                {
+                } else if (accumulator == "number") {
                     tokens.emplace_back(TokenType::type, DataType::number);
                     break;
                 }
@@ -48,8 +38,7 @@ std::vector<Token> getTokens()
             case AccumulatorState::none:
                 break;
             }
-            switch (character)
-            {
+            switch (character) {
             case EOF:
                 return tokens;
             case '(':
@@ -86,13 +75,10 @@ std::vector<Token> getTokens()
 
             accumulator_state = AccumulatorState::none;
             accumulator = "";
-        }
-        else
-        {
+        } else {
             accumulator += character;
 
-            if (accumulator_state == AccumulatorState::none)
-            {
+            if (accumulator_state == AccumulatorState::none) {
                 if (isalpha(character) || character == '_')
                     accumulator_state = AccumulatorState::string;
                 else if (isdigit(character))

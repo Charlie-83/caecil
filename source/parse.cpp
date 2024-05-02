@@ -1,15 +1,11 @@
 #include "parse.hpp"
 #include "lex.hpp"
-#include <cstddef>
 #include <stdexcept>
 
-static Token check(int pointer, std::vector<Token> tokens, TokenType type)
-{
-    if (tokens[pointer].type != type)
-    {
+static Token check(int pointer, std::vector<Token> tokens, TokenType type) {
+    if (tokens[pointer].type != type) {
         std::string str;
-        switch (type)
-        {
+        switch (type) {
         case (TokenType::type):
             str = "type";
             break;
@@ -62,30 +58,28 @@ static Token check(int pointer, std::vector<Token> tokens, TokenType type)
 }
 
 template <typename T>
-static T checkGetData(int pointer, std::vector<Token> tokens, TokenType type)
-{
+static T checkGetData(int pointer, std::vector<Token> tokens, TokenType type) {
     return std::get<T>(check(pointer, tokens, type).data);
 }
 
-Node getAST(std::vector<Token> tokens) { return parse(tokens, 0); }
+Node getAST(std::vector<Token> tokens) {
+    int pointer = 0;
+    return parse(tokens, pointer);
+}
 
-Node parse(std::vector<Token> tokens, int *pointer)
-{
+Node parse(std::vector<Token> tokens, int &pointer) {
     SequenceNode expression_sequence = {{}, {}};
-    while (*pointer < (int)tokens.size())
-    {
+    while (pointer < (int)tokens.size()) {
         expression_sequence.nodes.push_back(parseExpression(tokens, pointer));
-        (*pointer)++;
+        pointer++;
     }
     return expression_sequence;
 }
 
-Node parseExpression(std::vector<Token> tokens, int *pointer)
-{
-    switch (tokens[*pointer].type)
-    {
+Node parseExpression(std::vector<Token> tokens, int &pointer) {
+    switch (tokens[pointer].type) {
     case TokenType::function:
-        (*pointer)++;
+        pointer++;
         return parseFunction(tokens, pointer);
     case TokenType::type:
         return parseDeclareAssign(tokens, pointer);
@@ -94,83 +88,71 @@ Node parseExpression(std::vector<Token> tokens, int *pointer)
     case TokenType::number:
         return parseNumber(tokens, pointer);
     default:
-        std::logic_error("Wrong token at start of expression");
+        throw std::logic_error("Wrong token at start of expression");
     }
 }
 
-Node parseNumber(std::vector<Token> tokens ,int *pointer)
-{
-    double value = checkGetData<double>(*pointer, tokens, TokenType::number);
-    *pointer += 1;
+Node parseNumber(std::vector<Token> tokens, int &pointer) {
+    double value = checkGetData<double>(pointer, tokens, TokenType::number);
+    ++pointer;
     return NumberNode{{}, value};
 }
 
-Node parseFunction(std::vector<Token> tokens, int *pointer)
-{
+Node parseFunction(std::vector<Token> tokens, int &pointer) {
     DataType return_type;
     std::string name;
-    return_type = checkGetData<DataType>(*pointer, tokens, TokenType::type);
-    name = checkGetData<std::string>(*pointer + 1, tokens, TokenType::id);
-    check(*pointer + 1, tokens, TokenType::open_parenthesis);
+    return_type = checkGetData<DataType>(pointer, tokens, TokenType::type);
+    name = checkGetData<std::string>(pointer + 1, tokens, TokenType::id);
+    check(pointer + 1, tokens, TokenType::open_parenthesis);
 
-    *pointer += 3;
+    pointer += 3;
     std::vector<DataType> types = {};
     std::vector<std::string> args = {};
-    while (tokens[*pointer].type !=
+    while (tokens[pointer].type !=
            TokenType::close_parenthesis) // TODO: Deal with nested parenthesis
     {
-        types.push_back(
-            checkGetData<DataType>(*pointer, tokens, TokenType::type));
-        args.push_back(
-            checkGetData<std::string>(*pointer + 1, tokens, TokenType::id));
-        check(*pointer + 2, tokens, TokenType::comma);
-        *pointer += 3;
+        types.push_back(checkGetData<DataType>(pointer, tokens, TokenType::type));
+        args.push_back(checkGetData<std::string>(pointer + 1, tokens, TokenType::id));
+        check(pointer + 2, tokens, TokenType::comma);
+        pointer += 3;
     }
-    *pointer += 1;
-    if (tokens[*pointer].type != TokenType::open_brace)
+    pointer += 1;
+    if (tokens[pointer].type != TokenType::open_brace)
         return PrototypeNode{{}, return_type, name, types, args};
-    else
-    {
-        *pointer += 1;
+    else {
+        pointer += 1;
         std::vector<Node> body = {};
-        while (tokens[*pointer].type != TokenType::close_brace)
-        {
+        while (tokens[pointer].type != TokenType::close_brace) {
             body.push_back(parseExpression(tokens, pointer));
         }
-        switch (body.size())
-        {
+        switch (body.size()) {
         case 0:
             return FunctionNode{
-                {},
-                PrototypeNode{{}, return_type, name, types, args},
-                EmptyNode()};
+                {}, PrototypeNode{{}, return_type, name, types, args}, EmptyNode()};
         case 1:
             return FunctionNode{
                 {}, PrototypeNode{{}, return_type, name, types, args}, body[0]};
         default:
-            return FunctionNode{
-                {},
-                PrototypeNode{{}, return_type, name, types, args},
-                SequenceNode{{}, body}};
+            return FunctionNode{{},
+                                PrototypeNode{{}, return_type, name, types, args},
+                                SequenceNode{{}, body}};
         }
     }
 }
 
-Node parseAssign(std::vector<Token> tokens, int *pointer)
-{
-    auto name = checkGetData<std::string>(*pointer + 1, tokens, TokenType::id);
-    check(*pointer + 2, tokens, TokenType::equals);
-    *pointer += 3;
+Node parseAssign(std::vector<Token> tokens, int &pointer) {
+    auto name = checkGetData<std::string>(pointer + 1, tokens, TokenType::id);
+    check(pointer + 2, tokens, TokenType::equals);
+    pointer += 3;
     Node rhs = parseExpression(tokens, pointer);
     return AssignmentNode{{}, {{}, name}, rhs};
 }
 
-Node parseDeclareAssign(std::vector<Token> tokens, int *pointer)
-{
-    auto type = checkGetData<DataType>(*pointer, tokens, TokenType::type);
-    auto name = checkGetData<std::string>(*pointer + 1, tokens, TokenType::id);
-    check(*pointer + 2, tokens, TokenType::equals);
-    *pointer += 3;
+Node parseDeclareAssign(std::vector<Token> tokens, int &pointer) {
+    auto type = checkGetData<DataType>(pointer, tokens, TokenType::type);
+    auto name = checkGetData<std::string>(pointer + 1, tokens, TokenType::id);
+    check(pointer + 2, tokens, TokenType::equals);
+    pointer += 3;
     Node rhs = parseExpression(tokens, pointer);
     return DeclareAssignmentNode{{}, type, {{}, name}, rhs};
 }
